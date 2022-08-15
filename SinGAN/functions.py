@@ -13,7 +13,7 @@ from SinGAN.imresize import imresize, imresize_to_shape, imresize_in
 import os
 import random
 from torchvision import transforms
-import dill
+
 
 
 
@@ -228,7 +228,7 @@ def load_trained_pyramid(opt, mode_='train'):
         Ds = torch.load('%s/Ds.pth' % dir,map_location=opt.device)
         Zs = torch.load('%s/Zs.pth' % dir,map_location=opt.device)
         reals = torch.load('%s/reals.pth' % dir,map_location=opt.device)
-        NoiseAmp = torch.load('%s/NoiseAmp.pth' % dir,map_location=opt.device, pickle_module=dill)
+        NoiseAmp = torch.load('%s/NoiseAmp.pth' % dir,map_location=opt.device)
     else:
         print('no appropriate trained model is exist, please train first')
     opt.mode = mode
