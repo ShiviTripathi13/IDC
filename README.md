@@ -1,7 +1,7 @@
 # IDC
 
 
-### Official pytorch implementation of the paper: "IDC: [Internal Diverse Image Completion] (https://arxiv.org/pdf/2212.10280.pdf)"
+### Official pytorch implementation of the paper: ["Internal Diverse Image Completion (IDC)"](https://arxiv.org/pdf/2212.10280.pdf)
 
 With IDC you can train a generative model from a partial single image in order to generate at inference diverse solutions to the completion task.
 
