@@ -14,7 +14,9 @@ class ConvBlock(nn.Sequential):
 
     def forward(self,x):
         weight = self.conv.weight.clone()
+        x = x.clone()
         x = F.conv2d(x, weight, self.conv.bias, stride=self.conv.stride, padding=self.conv.padding)
+        x = x.clone()
         print(self.conv.weight._version)
         x = self.norm(x)
         x = self.relu(x)
@@ -70,6 +72,7 @@ class GeneratorConcatSkip2CleanAdd(nn.Module):
     def forward(self,x,y):
         x = self.head(x)
         x = self.body(x)
+        x = x.clone()
         x = self.tail(x)
         ind = int((y.shape[2]-x.shape[2])/2)
         y = y[:,0:3,ind:(y.shape[2]-ind),ind:(y.shape[3]-ind)]
@@ -86,7 +89,9 @@ class MaskConvBlock(nn.Sequential):
     def forward(self,x,mask):
         weight = self.conv.weight.clone()
         print(self.conv.weight._version)
+        x = x.clone()
         x = F.conv2d(x, weight, self.conv.bias, stride=self.conv.stride, padding=self.conv.padding)
+        x = x.clone()
         diff = int((mask.shape[2] - x.shape[2]) / 2)
         # diff = 5
         im = torch.abs(1 - mask).cpu()
@@ -128,6 +133,7 @@ class WDiscriminatorMask(nn.Module):
         x = self.body.block1(x,mask)
         x = self.body.block2(x,mask)
         x = self.body.block3(x,mask)
+        x = x.clone()
         x = self.tail(x)
         diff = int((mask.shape[2] - x.shape[2]) / 2)
         im = torch.abs(1 - mask).cpu()
