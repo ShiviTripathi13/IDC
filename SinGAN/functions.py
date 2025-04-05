@@ -153,8 +153,7 @@ def np2torch(x,opt=None):
     x = torch.from_numpy(x)
     if not(opt.not_cuda):
         x = move_to_gpu(x,opt.device)
-    #x = x.type(torch.cuda.FloatTensor) if not(opt.not_cuda) else x.type(torch.FloatTensor)
-    x = x.type(torch.FloatTensor)
+    x = x.type(torch.cuda.FloatTensor) if not(opt.not_cuda) else x.type(torch.FloatTensor)
     x = norm(x)
     return x
 
