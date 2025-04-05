@@ -388,7 +388,7 @@ def draw_concat(Gs,Zs,reals,NoiseAmp,in_s,mode,m_noise,m_image,opt):
                 G_z = G(z_in.detach(),G_z)
                 G_z = imresize(G_z,1/opt.scale_factor,opt)
                 G_z = G_z[:,:,0:real_next.shape[2],0:real_next.shape[3]]
-                count += 1
+                count = count.clone() + 1
         if mode == 'rec':
             count = 0
             for G,Z_opt,real_curr,real_next,noise_amp in zip(Gs,Zs,reals,reals[1:],NoiseAmp):
@@ -399,7 +399,7 @@ def draw_concat(Gs,Zs,reals,NoiseAmp,in_s,mode,m_noise,m_image,opt):
                 G_z = G(z_in.detach(),G_z)
                 G_z = imresize(G_z,1/opt.scale_factor,opt)
                 G_z = G_z[:,:,0:real_next.shape[2],0:real_next.shape[3]].to(opt.device)
-                count += 1
+                count = count.clone() + 1
     return G_z
 
 def init_models(opt):
@@ -431,7 +431,7 @@ def calc_init_inpaint(img,mask,opt):
         min_val = np.floor(min_val)
         if min_val <= 1:
             break
-        depth += 1
+        depth = depth.clone() + 1
 
 
     net = skip(input_depth, 3, num_channels_down=[128] * depth,
@@ -452,7 +452,7 @@ def calc_init_inpaint(img,mask,opt):
         total_loss = mse(out * mask, img * mask)
         loss.append(total_loss.detach())
         tmp = 0.05 * functions.RGB_1NN(out, opt, opt.idx_object)
-        total_loss += tmp
+        total_loss = total_loss.clone() + tmp
         total_loss.backward()
         optimizer.step()
     out = out * (1-mask) + img * mask

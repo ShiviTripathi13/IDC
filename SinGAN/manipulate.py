@@ -68,7 +68,7 @@ def generate_gif(Gs,Zs,reals,NoiseAmp,opt,alpha=0.1,beta=0.9,start_scale=2,fps=1
                 I_curr = I_curr.astype(np.uint8)
 
             images_cur.append(I_curr)
-        count += 1
+        count = count.clone() + 1
     dir2save = functions.generate_dir2save(opt)
     try:
         os.makedirs('%s/start_scale=%d' % (dir2save,start_scale) )
@@ -89,7 +89,7 @@ def SinGAN_generate(Gs,Zs,reals,NoiseAmp,opt,in_s=None,scale_v=1,scale_h=1,n=0,g
         elif diversity < 1:
             diversity = 1
     erode_val = 8 - diversity #diversity should be between 1-8.
-    dir2save += '/diversity_%d' % (diversity)
+    dir2save = dir2save.clone() + '/diversity_%d' % (diversity)
     if not os.path.exists(dir2save):
         os.makedirs(dir2save)
     if not folder_to_save=='':
@@ -153,7 +153,7 @@ def SinGAN_generate(Gs,Zs,reals,NoiseAmp,opt,in_s=None,scale_v=1,scale_h=1,n=0,g
             z_in = noise_amp*(z_curr)+I_prev
             I_curr = G(z_in.detach(),I_prev)
             images_cur.append(I_curr)
-        n+=1
+        n = n.clone() + 1
 
     functions.calc_mask(masks[-1], reals[-1][:, 0:3, :, :], opt, folder='')
     mask_merge[:,:,opt.idx_object[0],opt.idx_object[1]] = 1

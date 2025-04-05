@@ -270,7 +270,7 @@ def generate_dir2save(opt):
     if opt.details:
         dir2save = dir2save + '_' + opt.details
     if 'background' in opt.details:
-        dir2save += '_ratio%d' % opt.ratio
+        dir2save = dir2save.clone() + '_ratio%d' % opt.ratio
     return dir2save
 
 def post_config(opt):

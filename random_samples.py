@@ -22,7 +22,7 @@ if __name__ == '__main__':
     reals = []
     NoiseAmp = []
     if 'background' in opt.details:
-        opt.details += '_scale_to_start_masking_' + str(opt.scale_to_start_masking_object)
+        opt.details = opt.details.clone() + '_scale_to_start_masking_' + str(opt.scale_to_start_masking_object)
 
     dir2save = functions.generate_dir2save(opt)
     if dir2save is None:
