@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 import numpy as np
 import sys
 sys.path.append("..")
@@ -12,7 +13,8 @@ class ConvBlock(nn.Sequential):
         self.relu = nn.LeakyReLU(0.2, inplace=False)
 
     def forward(self,x):
-        x = self.conv(x)
+        weight = self.conv.weight.clone()
+        x = F.conv2d(x, weight, self.conv.bias, self.conv.stride, self.conv.padding)
         x = self.norm(x)
         x = self.relu(x)
         return x
@@ -81,7 +83,8 @@ class MaskConvBlock(nn.Sequential):
         self.relu = nn.LeakyReLU(0.2, inplace=False)
 
     def forward(self,x,mask):
-        x = self.conv(x)
+        weight = self.conv.weight.clone()
+        x = F.conv2d(x, weight, self.conv.bias, self.conv.stride, self.conv.padding)
         diff = int((mask.shape[2] - x.shape[2]) / 2)
         # diff = 5
         im = torch.abs(1 - mask).cpu()
