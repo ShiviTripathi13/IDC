@@ -431,7 +431,7 @@ def calc_init_inpaint(img,mask,opt):
         min_val = np.floor(min_val)
         if min_val <= 1:
             break
-        depth = depth.clone() + 1
+        depth = depth + 1
 
 
     net = skip(input_depth, 3, num_channels_down=[128] * depth,
