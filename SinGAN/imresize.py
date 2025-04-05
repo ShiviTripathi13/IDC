@@ -82,7 +82,7 @@ def imresize_in(im, scale_factor=None, output_shape=None, kernel=None, antialias
     }.get(kernel)
 
     # Antialiasing is only used when downscaling
-    antialiasing = antialiasing.clone() * (scale_factor[0] < 1)
+    antialiasing = antialiasing * (scale_factor[0] < 1)
 
     # Sort indices of dimensions according to scale of each dimension. since we are going dim by dim this is efficient
     sorted_dims = np.argsort(np.array(scale_factor)).tolist()
