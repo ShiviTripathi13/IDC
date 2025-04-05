@@ -143,7 +143,7 @@ def contributions(in_length, out_length, scale, kernel, kernel_width, antialiasi
     # When anti-aliasing is activated (default and only for downscaling) the receptive field is stretched to size of
     # 1/sf. this means filtering is more 'low-pass filter'.
     fixed_kernel = (lambda arg: scale * kernel(scale * arg)) if antialiasing else kernel
-    kernel_width = kernel_width.clone() * 1.0 / scale if antialiasing else 1.0
+    kernel_width = kernel_width * 1.0 / scale if antialiasing else 1.0
 
     # These are the coordinates of the output image
     out_coordinates = np.arange(1, out_length+1)
