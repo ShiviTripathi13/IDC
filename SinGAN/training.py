@@ -306,8 +306,8 @@ def train_single_scale(netD,netG,reals,Gs,Zs,in_s,NoiseAmp,opt,masks=None,center
                 if opt.mask_scale:
                     tmp2[:, 0:3, opt.idx_object[0], opt.idx_object[1]] = 0
                     tmp1[:, 0:3, opt.idx_object[0], opt.idx_object[1]] = 0
-                    tmp2 *= opt.mask_gradual
-                    tmp1 *= opt.mask_gradual
+                    tmp2 = tmp2.clone() * opt.mask_gradual
+                    tmp1 = tmp1.clone() * opt.mask_gradual
                 rec_loss = alpha*loss(tmp1[:,0:3,:,:],tmp2[:,0:3,:,:]) * opt.pixelImageTorecMaskRatio
                 rec_loss.backward(retain_graph=True)
                 rec_loss = rec_loss.detach()
