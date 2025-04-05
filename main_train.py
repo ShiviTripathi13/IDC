@@ -5,6 +5,9 @@ import SinGAN.functions as functions
 import time
 from datetime import datetime
 from config import get_arguments
+import torch
+torch.autograd.set_detect_anomaly(True)
+
 
 if __name__ == '__main__':
     parser = get_arguments()
