@@ -14,7 +14,8 @@ class ConvBlock(nn.Sequential):
 
     def forward(self,x):
         weight = self.conv.weight.clone()
-        x = F.conv2d(x, weight, self.conv.bias, self.conv.stride, self.conv.padding)
+        x = F.conv2d(x, weight, self.conv.bias, stride=self.conv.stride, padding=self.conv.padding)
+        print(self.conv.weight._version)
         x = self.norm(x)
         x = self.relu(x)
         return x
@@ -84,7 +85,8 @@ class MaskConvBlock(nn.Sequential):
 
     def forward(self,x,mask):
         weight = self.conv.weight.clone()
-        x = F.conv2d(x, weight, self.conv.bias, self.conv.stride, self.conv.padding)
+        print(self.conv.weight._version)
+        x = F.conv2d(x, weight, self.conv.bias, stride=self.conv.stride, padding=self.conv.padding)
         diff = int((mask.shape[2] - x.shape[2]) / 2)
         # diff = 5
         im = torch.abs(1 - mask).cpu()
