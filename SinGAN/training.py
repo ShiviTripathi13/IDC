@@ -13,7 +13,8 @@ import matplotlib.pyplot as plt
 from SinGAN.imresize import imresize, imresize_to_shape
 from SinGAN.models import skip
 
-
+import torch
+torch.autograd.set_detect_anomaly(True)
 
 sys.path.append("..")
 
