@@ -9,7 +9,7 @@ class ConvBlock(nn.Sequential):
         super(ConvBlock,self).__init__()
         self.conv = nn.Conv2d(in_channel, out_channel, kernel_size=ker_size, stride=stride, padding=padd)
         self.norm = nn.BatchNorm2d(out_channel) #out_channel
-        self.relu = nn.LeakyReLU(0.2, inplace=True)
+        self.relu = nn.LeakyReLU(0.2, inplace=False)
 
     def forward(self,x):
         x = self.conv(x)
@@ -78,7 +78,7 @@ class MaskConvBlock(nn.Sequential):
         super(MaskConvBlock, self).__init__()
         self.conv = nn.Conv2d(in_channel, out_channel, kernel_size=ker_size, stride=stride, padding=padd)
         self.norm = nn.BatchNorm2d(out_channel) #BatchNorm1d
-        self.relu = nn.LeakyReLU(0.2, inplace=True)
+        self.relu = nn.LeakyReLU(0.2, inplace=False)
 
     def forward(self,x,mask):
         x = self.conv(x)
@@ -355,7 +355,7 @@ def act(act_fun='LeakyReLU'):
     '''
     if isinstance(act_fun, str):
         if act_fun == 'LeakyReLU':
-            return nn.LeakyReLU(0.2, inplace=True)
+            return nn.LeakyReLU(0.2, inplace=False)
         elif act_fun == 'Swish':
             return Swish()
         elif act_fun == 'ELU':
