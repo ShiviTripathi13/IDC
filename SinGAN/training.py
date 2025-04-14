@@ -204,7 +204,53 @@ def train_single_scale(netD,netG,reals,Gs,Zs,in_s,NoiseAmp,opt,masks=None,center
                 z_opt = m_noise(z_opt)
             noise_ = functions.generate_noise([opt.nc_z,opt.nzx,opt.nzy],num_samp=batch_size, device=opt.device)
             noise_ = m_noise(noise_)
+       
+
+
         ############################
+        # (2) Update G network: maximize D(G(z))
+        ###########################
+        for j in range(opt.Gsteps):
+            netG.zero_grad()
+            output = netD(fake)
+            errG = -output.mean()
+            errG.backward(retain_graph=True)
+
+            if alpha!=0:
+                loss = nn.MSELoss()
+                Z_opt = opt.noise_amp * z_opt + z_prev
+                tmp1 = netG(Z_opt.detach(),z_prev)
+                tmp2 = real.clone()
+                if opt.mask_scale:
+                    tmp2[:, 0:3, opt.idx_object[0], opt.idx_object[1]] = 0
+                    tmp1[:, 0:3, opt.idx_object[0], opt.idx_object[1]] = 0
+                    tmp2 *= opt.mask_gradual
+                    tmp1 *= opt.mask_gradual
+                rec_loss = alpha*loss(tmp1[:,0:3,:,:],tmp2[:,0:3,:,:]) * opt.pixelImageTorecMaskRatio
+                rec_loss.backward(retain_graph=True)
+                rec_loss = rec_loss.detach()
+                if epoch % 500 == 0 or epoch == (opt.niter - 1):
+                    plt.figure(figsize=(10, 10))
+                    plt.subplot(1, 2, 1)
+                    plt.imshow(functions.convert_image_np(tmp1.detach()))
+                    t = (alpha*loss(tmp1,tmp2) * opt.pixelImageToMaskRatio).detach()
+                    plt.title('netG(noise)_loss_%.5f' % t)
+                    plt.axis('off')
+                    plt.subplot(1, 2, 2)
+                    plt.imshow(functions.convert_image_np(tmp2))
+                    plt.axis('off')
+                    plt.title('real')
+                    plt.savefig('%s/rec_loss_epoch_%d.png' % (opt.outf, epoch))
+                    plt.close()
+            else:
+                Z_opt = z_opt
+                rec_loss = 0
+            optimizerG.step()
+
+
+        errG2plot.append((errG.detach()+rec_loss).cpu())
+
+         ############################
         # (1) Update D network: maximize D(x) + D(G(z))
         ###########################
         for j in range(opt.Dsteps):
@@ -286,50 +332,8 @@ def train_single_scale(netD,netG,reals,Gs,Zs,in_s,NoiseAmp,opt,masks=None,center
         errD2plot.append(errD.detach().cpu())
 
         gradPenalty.append(gradient_penalty.detach().cpu())
-
-
-        ############################
-        # (2) Update G network: maximize D(G(z))
-        ###########################
-        for j in range(opt.Gsteps):
-            netG.zero_grad()
-            output = netD(fake)
-            errG = -output.mean()
-            errG.backward(retain_graph=True)
-
-            if alpha!=0:
-                loss = nn.MSELoss()
-                Z_opt = opt.noise_amp * z_opt + z_prev
-                tmp1 = netG(Z_opt.detach(),z_prev)
-                tmp2 = real.clone()
-                if opt.mask_scale:
-                    tmp2[:, 0:3, opt.idx_object[0], opt.idx_object[1]] = 0
-                    tmp1[:, 0:3, opt.idx_object[0], opt.idx_object[1]] = 0
-                    tmp2 *= opt.mask_gradual
-                    tmp1 *= opt.mask_gradual
-                rec_loss = alpha*loss(tmp1[:,0:3,:,:],tmp2[:,0:3,:,:]) * opt.pixelImageTorecMaskRatio
-                rec_loss.backward(retain_graph=True)
-                rec_loss = rec_loss.detach()
-                if epoch % 500 == 0 or epoch == (opt.niter - 1):
-                    plt.figure(figsize=(10, 10))
-                    plt.subplot(1, 2, 1)
-                    plt.imshow(functions.convert_image_np(tmp1.detach()))
-                    t = (alpha*loss(tmp1,tmp2) * opt.pixelImageToMaskRatio).detach()
-                    plt.title('netG(noise)_loss_%.5f' % t)
-                    plt.axis('off')
-                    plt.subplot(1, 2, 2)
-                    plt.imshow(functions.convert_image_np(tmp2))
-                    plt.axis('off')
-                    plt.title('real')
-                    plt.savefig('%s/rec_loss_epoch_%d.png' % (opt.outf, epoch))
-                    plt.close()
-            else:
-                Z_opt = z_opt
-                rec_loss = 0
-            optimizerG.step()
-
-
-        errG2plot.append((errG.detach()+rec_loss).cpu())
+        
+        
         D_real2plot.append(D_x)
         D_fake2plot.append(D_G_z)
         D_realfake2GPlossplot.append(((-D_x + D_G_z) / gradient_penalty.detach()).cpu())
